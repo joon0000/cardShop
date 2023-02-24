@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>card shop</title>
+    <link rel="stylesheet" type="text/css" href="stlye.css">
+    <!-- <script src="./node_modules/web3/dist/web3.min.js">
+    </script> -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body onload="listtable()">
+    <nav>
+        <div class="nav-container">
+            <label class="col-lg-1 control-label">Status</label>
+            <h3 id="result"></h3>
+            Status: <span id="status">Loading...</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="table">
+           <!-- <table id="t01" class="table-item">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Character</th>
+                        <th>Owner</th>
+                    </tr>
+                </thead>
+                <tbody id="rows">
+                </tbody>
+           </table> -->
+            <h4>Owner Table</h4>
+            <table id="Owner_Table" class="table-item">
+                <tr>
+                    <th style="width: 200px;">Time</th>
+                    <th style="width: 600px;">Character</th>
+                    <th style="width: 1000px;">Owner(Address)</th>
+                </tr>
+            </table>
+        </div>
+        <div class="card">
+            <div class="card-item"> 
+                <img class="card-image" src="./img/dokja.jpeg">
+                <p id="char1">Kim Dokja</p>
+                <p>Price: 0.0000007 Ether</p>
+                <button class="button" id="btn1">Buy</button>
+            </div>
+            <div class="card-item"> 
+                <img class="card-image" src="./img/junghyuk.jpeg">
+                <p id="char2">Yoo Joonghyuk</p>
+                <p>Price: 0.0000006 Ether</p>
+                <button class="button" id="btn2">Buy</button>
+            </div>
+            <div class="card-item"> 
+                <img class="card-image" src="./img/heewon.jpeg">
+                <p id="char3">Jung Heewon</p>
+                <p>Price: 0.0000005 Ether</p>
+                <button class="button" id="btn3">Buy</button>
+            </div>
+            <div class="card-item"> 
+                <img class="card-image" src="./img/sanga.jpeg">
+                <p id="char4">Yoo Sangah</p>
+                <p>Price: 0.0000004 Ether</p>
+                <button class="button" id="btn4">Buy</button>
+            </div>
+            <div class="card-item"> 
+                <img class="card-image" src="./img/jihye.jpeg">
+                <p id="char5">Lee Jihye</p>
+                <p>Price: 0.0000003 Ether</p>
+                <button class="button" id="btn5">Buy</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js">
+    </script>
+    <script>
+        
+        // ===Connecting to MetaMask===
+        function loadWeb3() {
+            if (window.ethereum) {
+                // To get web3(.js) object
+                web3 = new Web3(window.ethereum);
+                
+                // To request user's account from Metamask
+                // ***std
+                ethereum
+                    .request({ method: 'eth_requestAccounts' })           
+                    .then(handleAccountsChanged)
+                    .catch((err) => {
+                        if (err.code === 4001) {
+                            // If this happens, the user rejected the connection request.
+                            console.log('Please connect to MetaMask.');
+                        } else {
+                            console.error(err);
+                        }
+                    });
+            }
+        }
+        
+        // ===Handle user accounts and accountsChanged===
+        let currentAccount = null;
+        
+        // Note that this event is emitted on page load.
+        // If the array of accounts is non-empty, you're already connected.
+        window.ethereum.on('accountsChanged', handleAccountsChanged);
+
+        // For now, 'eth_accounts' will continue to always return an array
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                // MetaMask is locked or the user has not connected any accounts
+                console.log('Please connect to MetaMask.');
+            } else if (accounts[0] !== currentAccount) {
+                currentAccount = accounts[0];
+            }
+        }
+
+        //***std
+        let abi = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "owner",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			}
+		],
+		"name": "btn1",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "owner",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			}
+		],
+		"name": "btn2",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "owner",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			}
+		],
+		"name": "btn3",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "owner",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			}
+		],
+		"name": "btn4",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "owner",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			}
+		],
+		"name": "btn5",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			}
+		],
+		"name": "NameAdded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "text",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "reason",
+				"type": "string"
+			}
+		],
+		"name": "RegistrationError",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "owner",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			}
+		],
+		"name": "test",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			}
+		],
+		"name": "checkName",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getOwnerList",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "time",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "owner",
+						"type": "string"
+					}
+				],
+				"internalType": "struct ProofOfCharacter.Bought[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+        
+        //***std
+        async function loadContract() {
+            //you can replace your new contract 
+            return await new web3.eth.Contract(abi, '0xA0e081d18CaeFB78fc3668bE5A2CE574e834c032');
+        }
+
+        async function load() {
+            await loadWeb3();
+            web3.contract = await loadContract();
+            updateStatus('Ready!');
+        }
+        
+        function updateStatus(status) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = status;
+            console.log(status);
+        }
+
+        var d = new Date(); // for now
+        d.getHours(); // => 9
+        d.getMinutes(); // =>  30
+        d.getSeconds(); // => 51
+        time = d.getHours().toLocaleString() + ":"  + d.getMinutes().toLocaleString() + ":"  + d.getSeconds().toLocaleString();
+
+        function listtable() {
+            web3.contract.methods.getOwnerList().call(function (error, result) {
+                console.log("listtable: "+result);
+
+                var table = document.getElementById("Owner_Table");
+                var body = table.createTBody();
+
+                result.forEach(element => {
+                    var row = body.insertRow(0);
+                    var cell0 = row.insertCell(0);
+                    cell0.innerHTML = element.time
+
+                    var cell1 = row.insertCell(1);
+                    cell1.innerHTML = element.name
+
+                    var cell2 = row.insertCell(2);
+                    cell2.innerHTML = element.owner
+                });
+            })
+        }
+//----------------------------------------------------------------button1----------------------------------------------------------------
+        $("#btn1").click(function() {
+            console.log(currentAccount);
+            console.log($("#char1").text(),time)
+            web3.contract.methods.btn1($("#char1").text(),currentAccount,time) //use method send
+                .send({from: currentAccount,value: web3.utils.toWei("0.0000007","ether")}
+                ,function(error,result){$("#result").html(result);
+            });
+            web3.contract.once('NameAdded',{},function(error,event){
+                if(!error){
+                    //addData(event.returnValues.time,event.returnValues.name,event.returnValues.from);
+                    console.log(event)
+                    console.log("successful purchase " + event.returnValues.name + event.returnValues.time)
+                    $("#result").html("Name: "+ event.returnValues.name + "Time: "+event.returnValues.time +"<br> => Hashed as " + event.returnValues.hash);
+                    window.location.reload();
+                }
+            });
+            web3.contract.once('RegistrationError',{},function(error,event){
+                if(!error){
+                    console.log("Error: "+event.returnValues.text+" Reason: "+event.returnValues.reason);
+                    $("#result").html("Error: "+ event.returnValues.text+"<br> => Reason: " + event.returnValues.reason);
+                    // window.location.reload();
+                }
+            });
+        });
+//----------------------------------------------------------------button1----------------------------------------------------------------
+        $("#btn2").click(function() {
+            console.log(currentAccount);
+            console.log($("#char2").text(),time)
+            web3.contract.methods.btn2($("#char2").text(),currentAccount,time) //use method send
+                .send({from: currentAccount,value: web3.utils.toWei("0.0000006","ether")}
+                ,function(error,result){$("#result").html(result);
+            });
+            web3.contract.once('NameAdded',{},function(error,event){
+                if(!error){
+                    //addData(event.returnValues.time,event.returnValues.name,event.returnValues.from);
+                    console.log(event)
+                    console.log("successful purchase " + event.returnValues.name + event.returnValues.time)
+                    $("#result").html("Name: "+ event.returnValues.name + "Time: "+event.returnValues.time +"<br> => Hashed as " + event.returnValues.hash);
+                    window.location.reload();
+                }
+            });
+            web3.contract.once('RegistrationError',{},function(error,event){
+                if(!error){
+                    console.log("Error: "+event.returnValues.text+" Reason: "+event.returnValues.reason);
+                    $("#result").html("Error: "+ event.returnValues.text+"<br> => Reason: " + event.returnValues.reason);
+                    // window.location.reload();
+                }
+            });
+        });
+//----------------------------------------------------------------button1----------------------------------------------------------------
+        $("#btn3").click(function() {
+            console.log(currentAccount);
+            console.log($("#char3").text(),time)
+            web3.contract.methods.btn3($("#char3").text(),currentAccount,time) //use method send
+                .send({from: currentAccount,value: web3.utils.toWei("0.0000005","ether")}
+                ,function(error,result){$("#result").html(result);
+            });
+            web3.contract.once('NameAdded',{},function(error,event){
+                if(!error){
+                    //addData(event.returnValues.time,event.returnValues.name,event.returnValues.from);
+                    console.log(event)
+                    console.log("successful purchase " + event.returnValues.name + event.returnValues.time)
+                    $("#result").html("Name: "+ event.returnValues.name + "Time: "+event.returnValues.time +"<br> => Hashed as " + event.returnValues.hash);
+                    window.location.reload();
+                }
+            });
+            web3.contract.once('RegistrationError',{},function(error,event){
+                if(!error){
+                    console.log("Error: "+event.returnValues.text+" Reason: "+event.returnValues.reason);
+                    $("#result").html("Error: "+ event.returnValues.text+"<br> => Reason: " + event.returnValues.reason);
+                    // window.location.reload();
+                }
+            });
+        });
+//----------------------------------------------------------------button1----------------------------------------------------------------
+        $("#btn4").click(function() {
+            console.log(currentAccount);
+            console.log($("#char4").text(),time)
+            web3.contract.methods.btn4($("#char4").text(),currentAccount,time) //use method send
+                .send({from: currentAccount,value: web3.utils.toWei("0.0000004","ether")}
+                ,function(error,result){$("#result").html(result);
+            });
+            web3.contract.once('NameAdded',{},function(error,event){
+                if(!error){
+                    //addData(event.returnValues.time,event.returnValues.name,event.returnValues.from);
+                    console.log(event)
+                    console.log("successful purchase " + event.returnValues.name + event.returnValues.time)
+                    $("#result").html("Name: "+ event.returnValues.name + "Time: "+event.returnValues.time +"<br> => Hashed as " + event.returnValues.hash);
+                    window.location.reload();
+                }
+            });
+            web3.contract.once('RegistrationError',{},function(error,event){
+                if(!error){
+                    console.log("Error: "+event.returnValues.text+" Reason: "+event.returnValues.reason);
+                    $("#result").html("Error: "+ event.returnValues.text+"<br> => Reason: " + event.returnValues.reason);
+                    // window.location.reload();
+                }
+            });
+        });
+//----------------------------------------------------------------button1----------------------------------------------------------------
+        $("#btn5").click(function() {
+            console.log(currentAccount);
+            console.log($("#char5").text(),time)
+            web3.contract.methods.btn5($("#char5").text(),currentAccount,time) //use method send
+                .send({from: currentAccount,value: web3.utils.toWei("0.0000003","ether")}
+                ,function(error,result){$("#result").html(result);
+            });
+            web3.contract.once('NameAdded',{},function(error,event){
+                if(!error){
+                    //addData(event.returnValues.time,event.returnValues.name,event.returnValues.from);
+                    console.log(event)
+                    console.log("successful purchase " + event.returnValues.name + event.returnValues.time)
+                    $("#result").html("Name: "+ event.returnValues.name + "Time: "+event.returnValues.time +"<br> => Hashed as " + event.returnValues.hash);
+                    window.location.reload();
+                }
+            });
+            web3.contract.once('RegistrationError',{},function(error,event){
+                if(!error){
+                    console.log("Error: "+event.returnValues.text+" Reason: "+event.returnValues.reason);
+                    $("#result").html("Error: "+ event.returnValues.text+"<br> => Reason: " + event.returnValues.reason);
+                    // window.location.reload();
+                }
+            });
+        });
+        load();
+    </script>
+</body>
+</html>
